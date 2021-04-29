@@ -12,16 +12,15 @@ def add_sell_order():
         sell_orders = {
             "orders": []
         }
-
+        
     price = input('Price: ')
     amount = input('Amount: ')
     order = {
         'price': price, 
         'amount': amount
         }
-    print(order)
-    sell_orders["orders"].append(order)
-    print(sell_orders)
+        
+    sell_orders['orders'].append(order)
 
     to_json(sell_orders, 'Sell_Orders.json')
 
