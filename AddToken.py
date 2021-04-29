@@ -32,7 +32,7 @@ def get_token_info(address):
     decimals = contract.functions._decimals().call()
     symbol = contract.functions._symbol().call()
     info = {
-        "address": address,
+        "address": web3.toChecksumAddress(address),
         "name": name,
         "symbol": symbol,
         "decimals": decimals
@@ -51,4 +51,3 @@ def get_balance(token_address, wallet_address):
     balance = int(json.loads(info.text)['result'])
     balance = str(round(web3.fromWei(balance, 'ether'), 2))
     return balance
-
