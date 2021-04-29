@@ -3,6 +3,8 @@ from tkinter.ttk import *
 import json
 import AddToken
 
+wallet = '0x067a6098217cFca37638c7f180fE0e0e9B0177A2'
+
 def get_json(filename):
     with open(filename) as file:
             data = json.load(file)
@@ -31,12 +33,12 @@ window.title('PancakeSwap Swapper')
 sell_token_address = StringVar()
 sell_tokens = Combobox(window, textvariable=sell_token_address)
 sell_tokens['values'] = get_symbols()
-sell_tokens.grid(column=0, row=1, ipadx=300)
+sell_tokens.grid(column=0, row=0, ipadx=300)
 
 buy_token_address = StringVar()
 buy_tokens = Combobox(window, textvariable=buy_token_address)
 buy_tokens['values'] = get_symbols()
-buy_tokens.grid(column=0, row=0, ipadx=300)
+buy_tokens.grid(column=0, row=1, ipadx=300)
 
 swap = Button(window, text='Swap')
 swap.grid(column=0, row=2)
@@ -50,7 +52,7 @@ sell_orders_listbox.grid(column=0, row=3, ipadx=100, pady=20)
 sell_orders_listbox = Listbox(window)
 sell_orders_listbox.grid(column=1, row=3, ipadx=100, pady=20)
 
-balance_label = Label(text=) 
+balance_label = Label(text=AddToken.get_balance(sell_tokens.get(), wallet)) 
 
 window.mainloop()
 

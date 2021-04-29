@@ -15,6 +15,11 @@ def to_json(data, file_name):
     with open(file_name, 'w', encoding='utf-8') as outfile:
         json.dump(data, outfile, ensure_ascii=False, indent=4)
 
+def get_json(filename):
+    with open(filename) as file:
+            data = json.load(file)
+    return data
+
 def get_abi(contract_address, key):
     data = requests.get('https://api.bscscan.com/api?module=contract&action=getabi&address=' + contract_address + '&apikey=' + key)
     abi = json.loads(data.text)['result']
@@ -43,6 +48,7 @@ def add_token(address):
 
 def get_balance(token_address, wallet_address):
     info = requests.get('https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=' + token_address + '&address=' + wallet_address + '&tag=latest&apikey=' + key_bsc)
-    print(info)
+    balance = int(json.loads(info.text)['result'])
+    balance = str(round(web3.fromWei(balance, 'ether'), 2))
+    return balance
 
-get_balance('0x55d398326f99059ff775485246999027b3197955', '0x067a6098217cFca37638c7f180fE0e0e9B0177A2')ex
