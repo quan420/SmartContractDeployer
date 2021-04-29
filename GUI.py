@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.ttk import *
 import json
+import AddToken
 
 def get_json(filename):
     with open(filename) as file:
@@ -15,6 +16,14 @@ def get_symbols():
         symbols.append(token['symbol'])
     return symbols
 
+def add_new_token():
+    add_token_window = Tk()
+    add_token_window.title('Add Token')
+    add_token_input = Entry(add_token_window)
+    add_token_input.grid(column=0, row=0, ipadx=150)
+    add_token_button = Button(add_token_window, text='Add', command= lambda: AddToken.add_token(add_token_input.get()))
+    add_token_button.grid(column=1, row=0)
+    add_token_window.mainloop
 
 window = Tk()
 window.title('PancakeSwap Swapper')
@@ -32,8 +41,8 @@ buy_tokens.grid(column=0, row=0, columnspan=2, ipadx=300)
 swap = Button(window, text='Swap')
 swap.grid(column=0, row=2)
 
-add_token = Button(window, text='Add Token')
-add_token.grid(column=1, row=2)
+add_token_button = Button(window, text='Add Token', command= lambda: add_new_token())
+add_token_button.grid(column=1, row=2)
 
 sell_orders_listbox = Listbox(window)
 sell_orders_listbox.grid(column=0, row=3, ipadx=100, pady=20)
