@@ -40,3 +40,9 @@ def add_token(address):
         tokens = json.load(tokens_json)
     tokens["tokens"].append(info)
     to_json(tokens, 'Tokens.json')
+
+def get_balance(token_address, wallet_address):
+    info = requests.get('https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=' + token_address + '&address=' + wallet_address + '&tag=latest&apikey=' + key_bsc)
+    print(info)
+
+get_balance('0x55d398326f99059ff775485246999027b3197955', '0x067a6098217cFca37638c7f180fE0e0e9B0177A2')ex
