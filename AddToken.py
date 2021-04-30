@@ -49,5 +49,5 @@ def add_token(address):
 def get_balance(token_address, wallet_address):
     info = requests.get('https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=' + token_address + '&address=' + wallet_address + '&tag=latest&apikey=' + key_bsc)
     balance = int(json.loads(info.text)['result'])
-    balance = str(round(web3.fromWei(balance, 'ether'), 2))
+    balance = web3.fromWei(balance, 'ether')
     return balance
