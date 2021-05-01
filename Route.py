@@ -5,7 +5,7 @@ import json
 # web3
 from web3 import Web3
 
-ankr_url = 'https://apis.ankr.com/c9620180182d471881027a3195a7806f/68be2fdb4a6658325e31f3765ed6c4fc/binance/full/main'
+ankr_url = 'https://apis.ankr.com/8a2c4aebebb2478194f40cc3626362ea/68be2fdb4a6658325e31f3765ed6c4fc/binance/full/main'
 
 key_bsc = '4QPP4QC7PZSQQCESUQVGIJH5A5MNK5NSVI'
 
@@ -15,7 +15,9 @@ factory_abi = '[{"inputs":[{"internalType":"address","name":"_feeToSetter","type
 WBNB_address = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
 BUSD_address = '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56'
 
-IL = 'Insucfficient Liquidity'
+IL = 'Insufficient Liquidity'
+SIL = 'Sell Insufficient Liquidity'
+BIL = 'Buy Insufficient Liquidity'
 
 web3 = Web3(Web3.HTTPProvider(ankr_url))
 
@@ -48,19 +50,24 @@ def get_token_route(sell_token, buy_token, sell_token_amount, route_token):
     if (sell_token_impact != IL and buy_token_impact != IL):
         total_impact = sell_token_impact[0] * (1 + (1 - buy_token_impact[0]))
         return total_impact, buy_token_impact[1]
-    else:
+    elif sell_token_impact == IL and buy_token_impact == IL:
         return IL
+    elif sell_token_impact == IL and buy_token_impact != IL:
+        return SIL
+    elif sell_token_impact != IL and buy_token_impact == IL:
+        return BIL
 
 # route_BUSD returns IF thus route_BUSD[1] == IF
 def get_route(sell_token, buy_token, sell_token_amount):
     route_WBNB = get_token_route(sell_token, buy_token, sell_token_amount, WBNB_address)
     route_BUSD = get_token_route(sell_token, buy_token, sell_token_amount, BUSD_address)
-    print(route_BUSD[1] * 3)
-    if route_BUSD != IL:
+    print(route_WBNB)
+    print(route_BUSD)
+    if route_WBNB != SIL and route_WBNB != IL and route_BUSD != IL and route_BUSD != BIL:
         route_WBNB_BUSD = [get_token_route(WBNB_address, buy_token, route_WBNB[1], BUSD_address)[0], get_token_route(WBNB_address, buy_token, route_WBNB[1], BUSD_address)[1]]
     else:
         route_WBNB_BUSD = IL
-    if route_WBNB != IL:
+    if route_BUSD != SIL and route_BUSD != IL and route_WBNB != IL and route_WBNB != BIL:
         route_BUSD_WBNB = [get_token_route(BUSD_address, buy_token, float(route_BUSD[1]), WBNB_address)[0], get_token_route(BUSD_address, buy_token, float(route_BUSD[1]), WBNB_address)[1]]    
     else:
         route_BUSD_WBNB = IL
@@ -69,7 +76,6 @@ def get_route(sell_token, buy_token, sell_token_amount):
     print(route_BUSD)
     print(route_WBNB_BUSD)
     print(route_BUSD_WBNB)
-
 
 get_route(web3.toChecksumAddress('0x55d398326f99059ff775485246999027b3197955'), web3.toChecksumAddress('0x9617857e191354dbea0b714d78bc59e57c411087'), 1000)
 
