@@ -1,3 +1,12 @@
 {
-    "orders": []
+    "orders": [
+        {
+            "price": "10",
+            "amount": "100"
+        },
+        {
+            "price": "100",
+            "amount": "200"
+        }
+    ]
 }

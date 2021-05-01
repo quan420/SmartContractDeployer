@@ -20,6 +20,16 @@ def get_symbols():
         symbols.append(token['symbol'])
     return symbols
 
+def get_sell_orders():
+    sell_orders = get_json('Sell_Orders.json')
+    orders = sell_orders['orders']
+    return orders
+
+def get_buy_orders():
+    buy_orders = get_json('Buy_Orders.json')
+    orders = buy_orders['orders']
+    return orders
+
 def add_new_token_update(token):
     AddToken.add_token(token)
     buy_tokens['values'] = get_symbols()
@@ -34,93 +44,121 @@ def add_new_token():
     add_token_button.grid(column=1, row=0)  
     add_token_window.mainloop
 
-def get_sell_token_balance(event):
-    symbol = sell_tokens.get()
+def get_token_balance(symbol):
     data = get_json('Tokens.json')
     tokens = data['tokens']
-    address = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
     for token in tokens:
         if token['symbol'] == symbol:
             address = token['address']
-    sell_balance = AddToken.get_balance(address, wallet)
-    balance_string = str(round(sell_balance, 2))
+    balance = AddToken.get_balance(address, wallet)
+    return balance
+
+def set_sell_token_balance(event):
+    symbol = sell_tokens.get()
+    balance = get_token_balance(symbol)
+    balance_string = str(round(balance, 2))
     sell_balance_labal_text.set('Balance: ' + balance_string)
 
-def get_buy_token_balance(event):
+def set_buy_token_balance(event):
     symbol = buy_tokens.get()
-    data = get_json('Tokens.json')
-    tokens = data['tokens']
-    address = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
-    for token in tokens:
-        if token['symbol'] == symbol:
-            address = token['address']
-    buy_balance = AddToken.get_balance(address, wallet)
-    balance_string = str(round(buy_balance, 2))
+    balance = get_token_balance(symbol)
+    balance_string = str(round(balance, 2))
     buy_balance_labal_text.set('Balance: ' + balance_string)
 
-def get_max():
-    sell_token_amount_text.set(str(sell_balance))
-    print(sell_balance)
+def set_max():
+    symbol = sell_tokens.get()
+    balance = get_token_balance(symbol)
+    balance_string = str(balance)
+    sell_token_amount_text.set(str(balance_string))
 
+def add_order():
+    sell_token = sell_tokens.get()
+    buy_token = buy_tokens.get()
+    amount = sell_token_amount.get()
+    
 # Main Window
 window = Tk()
 window.title('PancakeSwap Swapper')
 
+# Order Type
+v = IntVar()
+v.set(2)
+limit_order_button = Radiobutton(window, text='Limit Order', variable=v, value=1)
+limit_order_button.grid(column=0, row=0, sticky=E)
+market_order_button = Radiobutton(window, text='Market Order', variable=v, value=2)
+market_order_button.grid(column=0, row=0, sticky=W)
+
 # Sell Amount
 sell_token_amount_text = StringVar()
 sell_token_amount = Entry(window, textvariable=sell_token_amount_text)
-sell_token_amount.grid(column=0, row=0, ipadx=95, ipady=12, sticky=W)
+sell_token_amount.grid(column=0, row=1, ipadx=100, ipady=12.5, sticky=W)
 
 # Sell Token
 sell_tokens = Combobox(window)
 sell_tokens['values'] = get_symbols()
 sell_tokens.current(0)
-sell_tokens.grid(column=1, row=0, ipadx=88, sticky=SW)
-sell_tokens.bind("<<ComboboxSelected>>", get_sell_token_balance)
+sell_tokens.grid(column=1, row=1, ipadx=90, sticky=SW)
+sell_tokens.bind("<<ComboboxSelected>>", set_sell_token_balance)
 
 # Sell Token Balance
 sell_balance_labal_text = StringVar()
 sell_balance_labal_text.set('Balance: ' + str(round(sell_balance, 2)))
 sell_balance_label = Label(textvariable=sell_balance_labal_text)
-sell_balance_label.grid(column=1, row=0, ipady=2, sticky=NW)
+sell_balance_label.grid(column=1, row=1, ipady=2, sticky=NW)
 
 # Max Button
-max_button = Button(window, text='MAX', command= lambda: get_max())
-max_button.grid(column=1, row=0, sticky=NE)
+max_button = Button(window, text='MAX', command= lambda: set_max())
+max_button.grid(column=1, row=1, sticky=NE)
 
 # Buy Amount
 buy_token_amount_text = StringVar()
-buy_token_amount = Entry(window, textvariable=sell_token_amount_text)
-buy_token_amount.grid(column=0, row=1, ipadx=95, ipady=12, sticky=W)
+buy_token_amount = Entry(window, textvariable=buy_token_amount_text)
+buy_token_amount.grid(column=0, row=2, ipadx=100, ipady=12, sticky=W)
 
 # Buy Token
 buy_tokens = Combobox(window)
 buy_tokens['values'] = get_symbols()
 buy_tokens.current(0)
-buy_tokens.grid(column=1, row=1, ipadx=88, sticky=SW)
-buy_tokens.bind("<<ComboboxSelected>>", get_buy_token_balance)
+buy_tokens.grid(column=1, row=2, ipadx=90, sticky=SW)
+buy_tokens.bind("<<ComboboxSelected>>", set_buy_token_balance)
 
 # Buy Token Balance
 buy_balance_labal_text = StringVar()
 buy_balance_labal_text.set('Balance: ' + str(round(buy_balance, 2)))
 buy_balance_label = Label(textvariable=buy_balance_labal_text)
-buy_balance_label.grid(column=1, row=1, ipady=2, sticky=NW)
+buy_balance_label.grid(column=1, row=2, ipady=2, sticky=NW)
 
 # Swap Button
-swap = Button(window, text='Swap')
-swap.grid(column=0, row=2)
+swap_button = Button(window, text='Swap')
+swap_button.grid(column=0, row=3, sticky=W)
+
+# Add Order Button
+add_order_button = Button(window, text='Add Order', command= lambda: add_order())
+add_order_button.grid(column=0, row=3, sticky=E)
 
 # Add Token Button
 add_token_button = Button(window, text='Add Token', command= lambda: add_new_token())
-add_token_button.grid(column=1, row=2)
+add_token_button.grid(column=1, row=3)
 
 # Buy orders Listbox
+buy_orders_label = Label(window, text='Buy Orders')
+buy_orders_label.grid(column=0, row=4, pady=10, sticky=S)
+
 buy_orders_listbox = Listbox(window)
-buy_orders_listbox.grid(column=0, row=3, ipadx=100, ipady=20, pady=10, sticky=E)
+buy_orders = get_buy_orders()
+for x in range(len(buy_orders)):
+    buy_orders_listbox.insert(x+1, buy_orders[x])
+buy_orders_listbox.grid(column=0, row=5, ipadx=100, sticky=NE)
 
 # Sell Order Listbox
+sell_orders_label = Label(window, text='Sell Orders')
+sell_orders_label.grid(column=1, row=4, pady=10, sticky=S)
+
 sell_orders_listbox = Listbox(window)
-sell_orders_listbox.grid(column=1, row=3, ipadx=100, ipady=20, pady=10, sticky=W)
+sell_orders = get_sell_orders()
+for x in range(len(sell_orders)):
+    sell_orders_listbox.insert(x+1, sell_orders[x])
+sell_orders_listbox.grid(column=1, row=5, ipadx=100, sticky=NW)
 
 window.mainloop()
 
