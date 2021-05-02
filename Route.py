@@ -51,10 +51,10 @@ def get_token_route(route, sell_token_amount):
         impact = get_impact_amount(route[x], route[x+1], amount)
         if impact != IL:
             amount = impact[1]
-            total_impact = (1 - total_impact) * (1 - impact[0])
+            total_impact = 1 - ((1 - total_impact) * (1 - impact[0]))
         elif impact == IL:
             return IL
-    return impact, amount
+    return total_impact, amount
 
 def get_route(sell_token, buy_token, sell_token_amount):
     route_WBNB = get_token_route([sell_token, WBNB_address, buy_token], sell_token_amount)
