@@ -44,34 +44,23 @@ def get_impact_amount(token_address_a, token_address_b, token_amount_a):
     else:
         return IL
 
-def get_token_route(sell_token, buy_token, sell_token_amount, route_token):
-    sell_token_impact = get_impact_amount(sell_token, route_token, sell_token_amount)
-    buy_token_impact = get_impact_amount(route_token, buy_token, sell_token_impact[1])
-    if (sell_token_impact != IL and buy_token_impact != IL):
-        total_impact = sell_token_impact[0] * (1 + (1 - buy_token_impact[0]))
-        return total_impact, buy_token_impact[1]
-    elif sell_token_impact == IL and buy_token_impact == IL:
-        return IL
-    elif sell_token_impact == IL and buy_token_impact != IL:
-        return SIL
-    elif sell_token_impact != IL and buy_token_impact == IL:
-        return BIL
+def get_token_route(route, sell_token_amount):
+    amount = sell_token_amount
+    total_impact = 0
+    for x in range(len(route)):
+        impact = get_impact_amount(route[x], route[x+1], amount)
+        if impact != IL:
+            amount = impact[1]
+            total_impact = (1 - total_impact) * (1 - impact[0])
+        elif impact == IL:
+            return IL
+    return impact, amount
 
-# route_BUSD returns IF thus route_BUSD[1] == IF
 def get_route(sell_token, buy_token, sell_token_amount):
-    route_WBNB = get_token_route(sell_token, buy_token, sell_token_amount, WBNB_address)
-    route_BUSD = get_token_route(sell_token, buy_token, sell_token_amount, BUSD_address)
-    print(route_WBNB)
-    print(route_BUSD)
-    if route_WBNB != SIL and route_WBNB != IL and route_BUSD != IL and route_BUSD != BIL:
-        route_WBNB_BUSD = [get_token_route(WBNB_address, buy_token, get_impact_amount(sell_token)[1], BUSD_address)[0], get_token_route(WBNB_address, buy_token, route_WBNB[1], BUSD_address)[1]]
-    else:
-        route_WBNB_BUSD = IL
-    if route_BUSD != SIL and route_BUSD != IL and route_WBNB != IL and route_WBNB != BIL:
-        route_BUSD_WBNB = [get_token_route(BUSD_address, buy_token, float(route_BUSD[1]), WBNB_address)[0], get_token_route(BUSD_address, buy_token, float(route_BUSD[1]), WBNB_address)[1]]    
-    else:
-        route_BUSD_WBNB = IL
-
+    route_WBNB = get_token_route([sell_token, WBNB_address, buy_token], sell_token_amount)
+    route_BUSD = get_token_route([sell_token, BUSD_address, buy_token], sell_token_amount)
+    route_WBNB_BUSD = get_token_route([sell_token, WBNB_address, BUSD_address, buy_token], sell_token_amount)
+    route_BUSD_WBNB = get_token_route([sell_token, BUSD_address, WBNB_address, buy_token], sell_token_amount)
     print(route_WBNB)
     print(route_BUSD)
     print(route_WBNB_BUSD)
