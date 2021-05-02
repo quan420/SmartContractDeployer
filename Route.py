@@ -47,7 +47,7 @@ def get_impact_amount(token_address_a, token_address_b, token_amount_a):
 def get_token_route(route, sell_token_amount):
     amount = sell_token_amount
     total_impact = 0
-    for x in range(len(route)):
+    for x in range(len(route) - 1):
         impact = get_impact_amount(route[x], route[x+1], amount)
         if impact != IL:
             amount = impact[1]
