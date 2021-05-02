@@ -64,7 +64,7 @@ def get_route(sell_token, buy_token, sell_token_amount):
     print(route_WBNB)
     print(route_BUSD)
     if route_WBNB != SIL and route_WBNB != IL and route_BUSD != IL and route_BUSD != BIL:
-        route_WBNB_BUSD = [get_token_route(WBNB_address, buy_token, route_WBNB[1], BUSD_address)[0], get_token_route(WBNB_address, buy_token, route_WBNB[1], BUSD_address)[1]]
+        route_WBNB_BUSD = [get_token_route(WBNB_address, buy_token, get_impact_amount(sell_token)[1], BUSD_address)[0], get_token_route(WBNB_address, buy_token, route_WBNB[1], BUSD_address)[1]]
     else:
         route_WBNB_BUSD = IL
     if route_BUSD != SIL and route_BUSD != IL and route_WBNB != IL and route_WBNB != BIL:
